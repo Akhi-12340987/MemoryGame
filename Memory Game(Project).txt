@@ -1,90 +1,81 @@
-import java.util.ArrayList; 
-import java.util.Collections; 
-import java.util.Scanner; 
+import java.util.Scanner;
 
-// class name : memorygame 
-public class MemoryGame { 
+public class MemoryGame {
+    private static final int SIZE = 4; 
+    private static int[][] board = {
+        {1, 2, 3, 4},
+        {4, 3, 2, 1},
+        {5, 6, 7, 8},
+        {8, 7, 6, 5}
+    };
+    private static boolean[][] revealed = new boolean[SIZE][SIZE]; 
+    private static Scanner scanner = new Scanner(System.in);
 
-	public static void main(String[] args) 
-	{ 
+    public static void main(String[] args) {
+        while (!gameOver()) {
+            printBoard(); 
+            playerMove(); 
+        }
+        System.out.println("Congratulations! You've matched all the cards!");
+    }
 
-		Scanner scanner = new Scanner(System.in); 
-		ArrayList<String> cards = new ArrayList<>(); 
-		cards.add("A"); 
-		cards.add("A"); 
-		cards.add("B"); 
-		cards.add("B"); 
-		cards.add("C"); 
-		cards.add("C"); 
-		cards.add("D"); 
-		cards.add("D"); 
-		Collections.shuffle(cards); 
+    private static void printBoard() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (revealed[i][j]) {
+                    System.out.print(board[i][j] + " ");
+                } else {
+                    System.out.print("* ");
+                }
+            }
+            System.out.println(); // Move to the next row
+        }
+    }
 
-		String[] board = new String[cards.size()]; 
-		boolean[] flipped = new boolean[cards.size()]; 
-		int pairsFound = 0; 
+    private static void playerMove() {
+        System.out.println("Enter the row and column of the first card to flip (e.g., 0 1): ");
+        int row1 = scanner.nextInt();
+        int col1 = scanner.nextInt();
 
-		while (pairsFound < 4) { 
-			printBoard(board); 
-			int firstIndex = getCardIndex( 
-				scanner, board, flipped, 
-				"Enter index of first card to flip:"); 
-			board[firstIndex] = cards.get(firstIndex); 
-			flipped[firstIndex] = true; 
-			printBoard(board); 
-			int secondIndex = getCardIndex( 
-				scanner, board, flipped, 
-				"Enter index of second card to flip:"); 
-			board[secondIndex] = cards.get(secondIndex); 
-			flipped[secondIndex] = true; 
+       
+        if (revealed[row1][col1]) {
+            System.out.println("This card is already revealed! Try again.");
+            return;
+        }
 
-			if (cards.get(firstIndex) 
-					.equals(cards.get(secondIndex))) { 
-				System.out.println("You found a pair!"); 
-				pairsFound++; 
-			} 
-			else { 
-				System.out.println( 
-					"Sorry, those cards don't match."); 
-				board[firstIndex] = " "; 
-				board[secondIndex] = " "; 
-				flipped[firstIndex] = false; 
-				flipped[secondIndex] = false; 
-			} 
-		} 
-		// win 
-		System.out.println("Congratulations, you won!"); 
-	} 
+        revealed[row1][col1] = true;
+        printBoard(); 
 
-	public static int getCardIndex(Scanner scanner, 
-								String[] board, 
-								boolean[] flipped, 
-								String prompt) 
-	{ 
-		int index; 
-		while (true) { 
-			System.out.println(prompt); 
-			index = scanner.nextInt(); 
-			if (index < 0 || index >= board.length) { 
-				System.out.println( 
-					"Invalid index, try again."); 
-			} 
-			else if (flipped[index]) { 
-				System.out.println( 
-					"Card already flipped, try again."); 
-			} 
-			else { 
-				break; 
-			} 
-		} 
-		return index; 
-	} 
+        System.out.println("Enter the row and column of the second card to flip (e.g., 1 2): ");
+        int row2 = scanner.nextInt();
+        int col2 = scanner.nextInt();
 
-	public static void printBoard(String[] board) 
-	{ 
-		for (int i = 0; i < board.length; i++) { 
-			System.out.print("| " + board[i] + " "); 
-		} 
-		System.out.println("|"); 
-	} 
+        
+        if (revealed[row2][col2]) {
+            System.out.println("This card is already revealed! Try again.");
+            revealed[row1][col1] = false; 
+            return;
+        }
+        revealed[row2][col2] = true;
+        printBoard(); // Show the board after both cards are flipped
+
+        if (board[row1][col1] != board[row2][col2]) {
+            System.out.println("No match! Cards will be flipped back.");
+            revealed[row1][col1] = false; 
+            revealed[row2][col2] = false; 
+        } else {
+            System.out.println("It's a match!");
+        }
+    }
+    private static boolean gameOver() {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                if (!revealed[i][j]) {
+                    return false; 
+                }
+            }
+        }
+        return true; 
+    }
 }
+		 
